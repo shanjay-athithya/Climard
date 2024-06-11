@@ -1,10 +1,15 @@
-from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
+from datetime import datetime
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.conf import settings
 import requests
 import logging
 import json
-from django.contrib import messages
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +46,6 @@ def led(request):
             return JsonResponse({'status': 'ESP32 IP not registered'})
     return render(request, 'led.html')
 
-
 # Global variable to store the latest sensor data
 latest_sensor_data = {
     "temperature": None,
@@ -49,8 +53,6 @@ latest_sensor_data = {
     "ldr": None,
     "timestamp": None
 }
-
-from datetime import datetime
 
 def get_time():
     current_time = datetime.now().strftime("%H:%M:%S")
@@ -79,17 +81,6 @@ def home(request):
 def get_sensor_data(request):
     global latest_sensor_data
     return JsonResponse({'status': 'success', 'data': latest_sensor_data})
-
-from django.contrib.auth import authenticate, login
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.http import JsonResponse, HttpResponseRedirect
-from django.conf import settings
-from django.core.mail import send_mail
 
 # Default threshold values
 TEMP_THRESHOLD = 37.0
@@ -126,7 +117,6 @@ def custom_admin_login(request):
         else:
             messages.error(request, "Invalid login credentials or not an admin.")
     return render(request, 'admin_login.html')
-
 
 def get_thresholds(request):
     global TEMP_THRESHOLD, LDR_THRESHOLD
